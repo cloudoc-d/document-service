@@ -9,6 +9,6 @@ _DOCUMENTS_COLLECTION = "documents"
 
 client = motor.motor_asyncio.AsyncIOMotorClient()
 import asyncio
-client.get_io_loop = asyncio.get_event_loop #?
+client.get_io_loop = asyncio.get_event_loop #???
 database = client.get_database(_MONGODB_NAME)
 documents_collection = database.get_collection(_DOCUMENTS_COLLECTION)

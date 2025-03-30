@@ -70,15 +70,19 @@ async def update_document(
     }
 
     doc = None
+    doc_query = {
+        "_id": ObjectId(document_id),
+        "owner_id": user.id
+    }
 
     if len(doc_fields) >= 1:
         doc = await collection.find_one_and_update(
-            filter={"_id": id},
+            filter=doc_query,
             update={"$set": doc_fields},
             return_document=True,
         )
     else:
-        doc = await collection.find_one({'_id': id})
+        doc = await collection.find_one(doc_query)
 
     if doc is None:
         raise HTTPException(
