@@ -1,13 +1,103 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, HTTPException, status
 
-from database import documents_collection as collection
-from models.document import Document
+from typing import Annotated
+from bson.objectid import ObjectId
 
+from app.database import documents_collection as collection
+from app.models.document import (
+    Document,
+    DocumentCollection,
+    DocumentCreate,
+    DocumentUpdate,
+)
+from app.models.user import User
+from app.auth_utils import get_active_user
+
+import datetime
+
+
+ActiveUser = Annotated[User, Depends(get_active_user)]
 
 router = APIRouter()
 
+
 @router.get(
     path='/',
-    response_model=list[Document],
+    response_model=DocumentCollection,
 )
-async def read_documents(self):
+async def get_all_documents(user: ActiveUser):
+    return DocumentCollection(
+        documents=await collection.find({'owner': user.id})
+    )
+
+
+@router.post(
+    path='/',
+    response_model=Document,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_document(user: ActiveUser, document_create: DocumentCreate):
+    doc = Document(
+        owner_id=user.id,
+        created_at=datetime.datetime.now(datetime.timezone.utc),
+        name=document_create.name
+    )
+    new_doc = await collection.insert_one(
+        doc.model_dump(by_alias=True, exclude=["id"])
+    )
+    created_doc = await collection.find_one(
+        filter={
+            "_id": new_doc.inserted_id
+        }
+    )
+    return created_doc
+
+
+@router.put(
+    path='/{document_id}',
+    response_model=Document,
+)
+async def update_document(
+    user: ActiveUser,
+    document_id: str,
+    document_update: DocumentUpdate,
+):
+    id = ObjectId(document_id)
+    doc_fields = {
+        k: v for k, v in \
+            document_update.model_dump(by_alias=True).items() \
+        if v is not None
+    }
+
+    doc = None
+
+    if len(doc_fields) >= 1:
+        doc = await collection.find_one_and_update(
+            filter={"_id": id},
+            update={"$set": doc_fields},
+            return_document=True,
+        )
+    else:
+        doc = await collection.find_one({'_id': id})
+
+    if doc is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Document {id} not found"
+        )
+
+    return doc
+
+
+@router.get(
+    path='/{document_id}',
+    response_model=Document,
+)
+async def get_document(user: ActiveUser, document_id: str):
+    ...
+
+@router.delete(
+    path='/{document_id}'
+)
+async def delete_document(user: ActiveUser, document_id: str):
+    ...

@@ -11,6 +11,7 @@ class UserRole(Enum):
 class User(BaseModel):
     id: str
     name: str = Field(max_length=32)
+    is_active: bool
     email: EmailStr
     roles: list[UserRole]
     created_at: datetime

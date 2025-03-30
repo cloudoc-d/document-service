@@ -4,11 +4,16 @@ version = "0.1.0"
 description = ""
 authors = ["zandari <kirillgluhih1@yandex.ru>"]
 readme = "README.md"
+package-mode = false
+
+[virtualenvs]
+in-project = true
 
 [tool.poetry.dependencies]
 python = "^3.11"
 fastapi = {extras = ["standard"], version = "^0.115.11"}
 motor = "^3.7.0"
+pytest = "^8.3.5"
 
 
 [build-system]
