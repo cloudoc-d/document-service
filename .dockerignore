@@ -1,8 +1,10 @@
 Dockerfile*
+docker*.yml
 README.md
 
 __pycache__/
 *.py[cod]
 
+.venv/
 venv/
 .env

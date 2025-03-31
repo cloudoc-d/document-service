@@ -1,0 +1,16 @@
+services:
+  document-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8080:8080"
+    volumes:
+      - '.:/app'
+    environment:
+      - MONGODB_URL=mongodb://localhost:27017/
+    depends_on:
+      - database
+
+  database:
+    image: mongodb/mongodb-community-server:latest
