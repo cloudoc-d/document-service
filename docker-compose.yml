@@ -1,5 +1,6 @@
 services:
-  document-service:
+  app:
+    container_name: ds-app
     build:
       context: .
       dockerfile: Dockerfile.dev
@@ -8,9 +9,13 @@ services:
     volumes:
       - '.:/app'
     environment:
-      - MONGODB_URL=mongodb://localhost:27017/
+      - MONGODB_URL=mongodb://database:27017/
     depends_on:
       - database
+    restart: unless-stopped
 
   database:
+    container_name: ds-mongodb
     image: mongodb/mongodb-community-server:latest
+    ports:
+      - "27017:27017"

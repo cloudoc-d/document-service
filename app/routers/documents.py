@@ -27,7 +27,7 @@ router = APIRouter()
 )
 async def get_all_documents(user: ActiveUser):
     return DocumentCollection(
-        documents=await collection.find({'owner': user.id})
+        documents=await collection.find({'owner': user.id}).to_list(1000)
     )
 
 

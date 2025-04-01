@@ -1,7 +1,3 @@
-import os
-
-os.environ['MONGODB_URL'] = "mongodb://localhost:27017/"
-
 from fastapi.testclient import TestClient
 from app.main import app
 
