@@ -61,3 +61,14 @@ def test_document_view():
     )
     assert response.status_code == 200, response.text
     assert response.json()['content'] != None
+
+def test_document_delete():
+    global document_id
+
+    response = client.delete(
+        url=f'/documents/{document_id}',
+        params={
+            "access_token": ACCESS_TOKEN
+        }
+    )
+    assert response.status_code == 204, response.text

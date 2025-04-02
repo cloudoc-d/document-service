@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 
 from typing import Annotated
 from bson.objectid import ObjectId
@@ -110,13 +110,23 @@ async def get_document(user: ActiveUser, document_id: str):
         {'_id': ObjectId(document_id), 'owner_id': user.id}
     )
     if doc is None:
-        raise HTTPException(status_code=404, detail="qwert")
+        raise HTTPException(
+            status_code=404,
+            detail=f"Document {document_id} not found"
+        )
 
     return doc
 
 @router.delete(
     path='/{document_id}',
-    response_model_by_alias=False,
+    status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_document(user: ActiveUser, document_id: str):
-    ...
+    del_result = await collection.delete_one(
+        {'_id': ObjectId(document_id), 'owner_id': user.id}
+    )
+
+    if del_result.deleted_count == 1:
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+    raise HTTPException(status_code=404, detail=f"Document {id} not found")
