@@ -14,11 +14,10 @@ class DocElement(BaseModel):
     content: list[dict]
 
 
-class Document(BaseModel):
+class DocumentInfo(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
     owner_id: str
     name: str
-    content: list[DocElement] = Field(default=[])
     created_at: datetime
     edited_at: Optional[datetime] = Field(default=None)
 
@@ -27,8 +26,12 @@ class Document(BaseModel):
     )
 
 
-class DocumentCollection(BaseModel):
-    documents: list[Document]
+class Document(DocumentInfo):
+    content: list[DocElement] = Field(default=[])
+
+
+class DocumentInfoCollection(BaseModel):
+    documents: list[DocumentInfo]
 
 
 class DocumentCreate(BaseModel):

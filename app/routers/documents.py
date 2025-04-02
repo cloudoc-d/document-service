@@ -6,7 +6,8 @@ from bson.objectid import ObjectId
 from app.database import documents_collection as collection
 from app.models.document import (
     Document,
-    DocumentCollection,
+    DocumentInfo,
+    DocumentInfoCollection,
     DocumentCreate,
     DocumentUpdate,
 )
@@ -23,11 +24,15 @@ router = APIRouter()
 
 @router.get(
     path='/',
-    response_model=DocumentCollection,
+    response_model=DocumentInfoCollection,
+    response_model_by_alias=False,
 )
 async def get_all_documents(user: ActiveUser):
-    return DocumentCollection(
-        documents=await collection.find({'owner': user.id}).to_list(1000)
+    return DocumentInfoCollection(
+        documents=await collection.find(
+            {'owner_id': user.id},
+            {'content': 0}
+        ).to_list(1000)
     )
 
 
@@ -35,6 +40,7 @@ async def get_all_documents(user: ActiveUser):
     path='/',
     response_model=Document,
     status_code=status.HTTP_201_CREATED,
+    response_model_by_alias=False,
 )
 async def create_document(user: ActiveUser, document_create: DocumentCreate):
     doc = Document(
@@ -56,6 +62,7 @@ async def create_document(user: ActiveUser, document_create: DocumentCreate):
 @router.put(
     path='/{document_id}',
     response_model=Document,
+    response_model_by_alias=False,
 )
 async def update_document(
     user: ActiveUser,
@@ -96,12 +103,20 @@ async def update_document(
 @router.get(
     path='/{document_id}',
     response_model=Document,
+    response_model_by_alias=False,
 )
 async def get_document(user: ActiveUser, document_id: str):
-    ...
+    doc = await collection.find_one(
+        {'_id': ObjectId(document_id), 'owner_id': user.id}
+    )
+    if doc is None:
+        raise HTTPException(status_code=404, detail="qwert")
+
+    return doc
 
 @router.delete(
-    path='/{document_id}'
+    path='/{document_id}',
+    response_model_by_alias=False,
 )
 async def delete_document(user: ActiveUser, document_id: str):
     ...
