@@ -1,7 +1,17 @@
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from .router import ActiveUser, router
+
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    Response,
+    WebSocket,
+    WebSocketException,
+    status
+)
 
 from typing import Annotated
-from bson.objectid import ObjectId
+from bson import ObjectId
 
 from app.database import documents_collection as collection
 from app.models.document import (
@@ -15,11 +25,6 @@ from app.models.user import User
 from app.auth_utils import get_active_user
 
 import datetime
-
-
-ActiveUser = Annotated[User, Depends(get_active_user)]
-
-router = APIRouter()
 
 
 @router.get(

@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from .routers.documents import router as documents_router
+from app.routers.documents import router as documents_router
 
 
 app = FastAPI()

@@ -33,6 +33,26 @@ test = ["anyio[trio]", "blockbuster (>=1.5.23)", "coverage[toml] (>=7)", "except
 trio = ["trio (>=0.26.1)"]
 
 [[package]]
+name = "broadcaster"
+version = "0.3.1"
+description = "Simple broadcast channels."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "broadcaster-0.3.1-py3-none-any.whl", hash = "sha256:433023ab6b6b4a8da9cbba95910eff52b1e767141419659be287cfd49f2a3ecb"},
+    {file = "broadcaster-0.3.1.tar.gz", hash = "sha256:35d1e174a98346d184cc6558979548340e877ae841c65c7e354153a84fe675d6"},
+]
+
+[package.dependencies]
+anyio = ">=3.4.0,<5"
+
+[package.extras]
+kafka = ["aiokafka"]
+postgres = ["asyncpg"]
+redis = ["redis"]
+test = ["pytest", "pytest-asyncio"]
+
+[[package]]
 name = "certifi"
 version = "2025.1.31"
 description = "Python package for providing Mozilla's CA Bundle."
@@ -1143,4 +1163,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "b79b60b405040a96682fbd1102e138c91383e7422ecf13511cba3c14278e9806"
+content-hash = "6d4f39d05956f1034b4f7fe1dfde7db5613f6bcc33f3444c41d180a5252f2ef1"
