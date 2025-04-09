@@ -11,7 +11,7 @@ def get_user(access_token: str | None = None) -> User:
             status_code=403,
             detail="access_token must be provided"
         )
-    ...
+    # TODO глушилка, жду доку к сервису авторизации
     from datetime import datetime
     if access_token == "asdfasdf":
         return User(
