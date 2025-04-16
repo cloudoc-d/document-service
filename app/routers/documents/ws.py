@@ -15,8 +15,9 @@ from app.models.document import (
 )
 from app.models.user import User
 from app.broadcast import broadcast
+from app.auth_utils import ActiveUserAnnotation
 
-from .router import ActiveUser, router
+from .router import router
 
 import anyio
 
@@ -60,7 +61,7 @@ def get_document_channel_name(document: Document) -> str:
 @router.websocket("/{document_id}/ws")
 async def edit_document_ws(
     websocket: WebSocket,
-    user: ActiveUser,
+    user: ActiveUserAnnotation,
     document_id: str,
 ):
     document = await get_document(document_id)

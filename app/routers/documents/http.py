@@ -1,4 +1,4 @@
-from .router import ActiveUser, router
+from .router import router
 
 from fastapi import (
     APIRouter,
@@ -22,7 +22,7 @@ from app.models.document import (
     DocumentUpdate,
 )
 from app.models.user import User
-from app.auth_utils import get_active_user
+from app.auth_utils import get_active_user, ActiveUserAnnotation
 
 import datetime
 
@@ -32,12 +32,17 @@ import datetime
     response_model=DocumentInfoCollection,
     response_model_by_alias=False,
 )
-async def get_all_documents(user: ActiveUser):
+async def get_documents(
+    user: ActiveUserAnnotation,
+    limit: int = 25,
+    offset: int = 0,
+    name: str | None = None,
+):
     return DocumentInfoCollection(
         documents=await collection.find(
             {'owner_id': user.id},
             {'content': 0}
-        ).to_list(1000)
+        ).to_list(limit)
     )
 
 
@@ -47,7 +52,10 @@ async def get_all_documents(user: ActiveUser):
     status_code=status.HTTP_201_CREATED,
     response_model_by_alias=False,
 )
-async def create_document(user: ActiveUser, document_create: DocumentCreate):
+async def create_document(
+    user: ActiveUserAnnotation,
+    document_create: DocumentCreate
+):
     doc = Document(
         owner_id=user.id,
         created_at=datetime.datetime.now(datetime.timezone.utc),
@@ -70,7 +78,7 @@ async def create_document(user: ActiveUser, document_create: DocumentCreate):
     response_model_by_alias=False,
 )
 async def update_document(
-    user: ActiveUser,
+    user: ActiveUserAnnotation,
     document_id: str,
     document_update: DocumentUpdate,
 ):
@@ -110,7 +118,7 @@ async def update_document(
     response_model=Document,
     response_model_by_alias=False,
 )
-async def get_document(user: ActiveUser, document_id: str):
+async def get_document(user: ActiveUserAnnotation, document_id: str):
     doc = await collection.find_one(
         {'_id': ObjectId(document_id), 'owner_id': user.id}
     )
@@ -126,7 +134,7 @@ async def get_document(user: ActiveUser, document_id: str):
     path='/{document_id}',
     status_code=status.HTTP_204_NO_CONTENT,
 )
-async def delete_document(user: ActiveUser, document_id: str):
+async def delete_document(user: ActiveUserAnnotation, document_id: str):
     del_result = await collection.delete_one(
         {'_id': ObjectId(document_id), 'owner_id': user.id}
     )

@@ -4,6 +4,8 @@ from typing import Annotated
 from app.models.user import User, UserRole
 
 
+
+
 def get_user(access_token: str | None = None) -> User:
     # raises HTTPException
     if access_token is None:
@@ -27,14 +29,25 @@ def get_user(access_token: str | None = None) -> User:
         detail="access_token is invalid"
     )
 
-def get_active_user(user: Annotated[User, Depends(get_user)]) -> User:
+
+UserAnnotation = Annotated[User, Depends(get_user)]
+
+
+def get_active_user(user: UserAnnotation) -> User:
     # raises HTTPException
     if not user.is_active:
         raise HTTPException(status_code=403, details="inactive user")
     return user
 
-def get_admin_user(user: Annotated[User, Depends(get_user)]) -> User:
+
+ActiveUserAnnotation = Annotated[User, Depends(get_active_user)]
+
+
+def get_admin_user(user: UserAnnotation) -> User:
     # raises HTTPException
     if UserRole.ADMIN not in user.roles:
         raise HTTPException(status_code=403, details="not an admin")
     return user
+
+
+AdminUserAnnotation = Annotated[User, Depends(get_admin_user)]

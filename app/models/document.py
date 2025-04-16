@@ -5,8 +5,8 @@ from typing import Annotated
 from enum import Enum
 
 from .user import User
+from .common import PyObjectId
 
-PyObjectId = Annotated[str, BeforeValidator(str)]
 
 
 class DocElement(BaseModel):
