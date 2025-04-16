@@ -19,6 +19,7 @@ class DocumentAccessRole(Enum):
     READER = 'reader'
     EDITOR = 'editor'
 
+
 class DocumentAccessRestriction(BaseModel):
     user_id: str
     role: DocumentAccessRole
@@ -44,6 +45,8 @@ class Document(DocumentInfo):
 
 class DocumentInfoCollection(BaseModel):
     documents: list[DocumentInfo]
+    presented_amount: int
+    total_amount: int
 
 
 class DocumentCreate(BaseModel):
@@ -51,4 +54,4 @@ class DocumentCreate(BaseModel):
 
 
 class DocumentUpdate(BaseModel):
-    name: str
+    name: str | None

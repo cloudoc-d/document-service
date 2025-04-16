@@ -1,6 +1,7 @@
+from bson import ObjectId
 from .router import router
 
-from fastapi import status
+from fastapi import status, HTTPException
 from app.models.style import (
     StyleInfo,
     StyleInfoCollection,
@@ -10,6 +11,7 @@ from app.models.style import (
 )
 from app.auth_utils import ActiveUserAnnotation
 from app.database import styles_collection as collection
+from app.routers.utils import update_record_from_model
 from datetime import datetime
 from typing import Optional
 
@@ -45,7 +47,15 @@ async def get_styles(
         {'content': 0}
     ).skip(offset).limit(limit).to_list(None)
 
-    return StyleInfoCollection(styles=styles)
+    total_amount = await collection.count_documents(
+        filter=filter_conditions
+    )
+
+    return StyleInfoCollection(
+        styles=styles,
+        presented_amount=len(styles),
+        total_amount=total_amount
+    )
 
 
 @router.post(
@@ -72,7 +82,7 @@ async def create_style(
     )
 
 
-@router.put(    # TODO PATCH ???
+@router.patch(
     path='/{style_id}',
     response_model=Style,
     response_model_by_alias=False,
@@ -82,7 +92,21 @@ async def update_style(
     style_id: str,
     style_update: StyleUpdate,
 ):
-    ...
+    style = update_record_from_model(
+        collection=collection,
+        update_model=style_update,
+        filter={
+            "_id": ObjectId(style_id),
+            "owner_id": user.id
+        }
+    )
+    if style is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="style not found"
+        )
+
+    return style
 
 
 @router.get(
@@ -91,7 +115,19 @@ async def update_style(
     response_model_by_alias=False,
 )
 async def get_style(user: ActiveUserAnnotation, style_id: str):
-    ...
+    style = await collection.find({"_id": ObjectId(style_id)})
+    if style is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="style not found"
+        )
+    if not (style.public or style.owner_id == user.id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="you have not access to this style"
+        )
+
+    return style
 
 
 @router.delete(
@@ -99,4 +135,9 @@ async def get_style(user: ActiveUserAnnotation, style_id: str):
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_style(user: ActiveUserAnnotation, style_id: str):
-    ...
+    deleted_style = await collection.delete_one(
+        {"_id": ObjectId(style_id), "owner_id": user.id}
+    )
+
+    if deleted_style.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="style not found")

@@ -19,6 +19,8 @@ class StyleInfo(BaseModel):
 
 class StyleInfoCollection(BaseModel):
     styles: list[StyleInfo]
+    presented_amount: int
+    total_amount: int
 
 
 class Style(StyleInfo):
@@ -29,5 +31,5 @@ class StyleCreate(BaseModel):
     name: str
 
 class StyleUpdate(BaseModel):
-    name: str
-    content: StyleContent
+    name: str | None
+    content: StyleContent | None

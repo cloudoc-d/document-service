@@ -23,6 +23,7 @@ from app.models.document import (
 )
 from app.models.user import User
 from app.auth_utils import get_active_user, ActiveUserAnnotation
+from typing import Optional
 
 import datetime
 
@@ -36,13 +37,31 @@ async def get_documents(
     user: ActiveUserAnnotation,
     limit: int = 25,
     offset: int = 0,
-    name: str | None = None,
+    name: Optional[str] = None,
 ):
+    filter_conditions = {
+        "owner_id": user.id,
+    }
+
+    if name:
+        filter_conditions["name"] = {
+            "$regex": f".*{name}.*",
+            "$options": "i"
+        }
+
+    styles = await collection.find(
+        filter_conditions,
+        {'content': 0}
+    ).skip(offset).limit(limit).to_list(None)
+
+    total_amount = await collection.count_documents(
+        filter=filter_conditions
+    )
+
     return DocumentInfoCollection(
-        documents=await collection.find(
-            {'owner_id': user.id},
-            {'content': 0}
-        ).to_list(limit)
+        styles=styles,
+        presented_amount=len(styles),
+        total_amount=total_amount
     )
 
 

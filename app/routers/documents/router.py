@@ -2,7 +2,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 
 
-router = APIRouter()
+router = APIRouter(prefix="documents")
 
 
 from .http import *
