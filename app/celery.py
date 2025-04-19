@@ -1,6 +1,6 @@
 from celery import Celery
-from renderer_definition.tasks import render_pdf_task
 from app.config import Config
+from renderer_definition.tasks import render_pdf_task
 
 import os
 

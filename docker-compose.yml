@@ -7,9 +7,14 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - '.:/app'
+      - './app:/app/app'
     environment:
-      - MONGODB_URL=mongodb://database:27017/
+      MONGODB_URL: mongodb://database:27017/
+      CELERY_BROKER_URL: amqp://guest:guest@rabbit:5672//
+      CELERY_RESULT_BACKEND: redis://redis:6379/
+    networks:
+      - cloudoc_network
+      - project_network
     depends_on:
       - database
     restart: unless-stopped
@@ -19,3 +24,13 @@ services:
     image: mongodb/mongodb-community-server:latest
     ports:
       - "27017:27017"
+    attach: false
+    networks:
+      - project_network
+
+
+networks:
+  cloudoc_network:
+    external: true
+  project_network:
+    driver: bridge

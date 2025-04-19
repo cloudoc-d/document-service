@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from bson import ObjectId
-from motor import MotorCollection
+from motor.motor_asyncio import AsyncIOMotorCollection
 from typing import Any
 
 
@@ -13,7 +13,7 @@ def _get_model_fields(model: BaseModel, by_alias=True) -> dict:
 
 
 async def update_record_from_model(
-    collection: MotorCollection,
+    collection: AsyncIOMotorCollection,
     filter: dict,
     update_model: BaseModel,
 ) -> Any | None:   # TODO what is it actually?
