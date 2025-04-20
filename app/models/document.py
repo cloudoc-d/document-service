@@ -29,6 +29,7 @@ class DocumentInfo(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
     owner_id: str
     name: str
+    style_id: Optional[PyObjectId] = Field(default=None)
     is_public: bool = Field(default=False)
     access_restrictions: list[DocumentAccessRestriction] = Field(default=list())
     created_at: datetime
