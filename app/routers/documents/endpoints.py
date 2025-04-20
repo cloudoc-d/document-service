@@ -1,3 +1,4 @@
+from app.routers.utils import update_record_from_model
 from .router import router
 
 from fastapi import (
@@ -22,7 +23,7 @@ from app.models.document import (
     DocumentUpdate,
 )
 from app.models.user import User
-from app.auth_utils import get_active_user, ActiveUserAnnotation
+from app.routers.auth_utils import get_active_user, ActiveUserAnnotation
 from typing import Optional
 
 import datetime
@@ -101,35 +102,21 @@ async def update_document(
     document_id: str,
     document_update: DocumentUpdate,
 ):
-    id = ObjectId(document_id)
-    doc_fields = {
-        k: v for k, v in \
-            document_update.model_dump(by_alias=True).items() \
-        if v is not None
-    }
-
-    doc = None
-    doc_query = {
-        "_id": ObjectId(document_id),
-        "owner_id": user.id
-    }
-
-    if len(doc_fields) >= 1:
-        doc = await collection.find_one_and_update(
-            filter=doc_query,
-            update={"$set": doc_fields},
-            return_document=True,
-        )
-    else:
-        doc = await collection.find_one(doc_query)
-
-    if doc is None:
+    document = update_record_from_model(
+        collection=collection,
+        update_model=document_update,
+        filter={
+            "_id": ObjectId(document_id),
+            "owner_id": user.id,
+        }
+    )
+    if document is None:
         raise HTTPException(
-            status_code=404,
-            detail=f"Document {id} not found"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detayil="document not found"
         )
 
-    return doc
+    return document
 
 
 @router.get(

@@ -5,6 +5,7 @@ from typing import Literal, Union
 
 class BlockType(Enum):
     PARAGRAPH = 'paragraph'
+    HEADER = 'header'
 
 
 
@@ -47,7 +48,7 @@ class BlockMovedEvent(BaseModel):
 
 
 class BlockRemovedEvent(BaseModel):
-    type: Literal["block-removec"]
+    type: Literal["block-removed"]
     data: BlockRemovedData
 
 
@@ -57,3 +58,7 @@ Event = Union[
     BlockMovedEvent,
     BlockRemovedEvent
 ]
+
+
+class EventsCollection(BaseModel):
+    events: list[Event]

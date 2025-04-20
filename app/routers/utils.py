@@ -3,6 +3,8 @@ from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorCollection
 from typing import Any
 
+import pydantic
+
 
 def _get_model_fields(model: BaseModel, by_alias=True) -> dict:
     return {

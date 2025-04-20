@@ -17,6 +17,8 @@ pytest = "^8.3.5"
 websockets = "^15.0.1"
 broadcaster = "^0.3.1"
 renderer-definition = {git = "https://github.com/cloudoc-d/renderer-definition.git"}
+redis = {extras = ["hiredis"], version = "^5.2.1"}
+apscheduler = "^3.11.0"
 
 
 [build-system]

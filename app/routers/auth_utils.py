@@ -4,8 +4,6 @@ from typing import Annotated
 from app.models.user import User, UserRole
 
 
-
-
 def get_user(access_token: str | None = None) -> User:
     # raises HTTPException
     if access_token is None:

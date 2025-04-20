@@ -9,7 +9,7 @@ from app.models.style import (
     StyleUpdate,
     Style,
 )
-from app.auth_utils import ActiveUserAnnotation
+from app.routers.auth_utils import ActiveUserAnnotation
 from app.database import styles_collection as collection
 from app.routers.utils import update_record_from_model
 from datetime import datetime

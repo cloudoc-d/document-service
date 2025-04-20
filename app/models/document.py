@@ -12,7 +12,7 @@ from .common import PyObjectId
 class DocElement(BaseModel):
     type: str   # maybe enum
     attrs: dict
-    content: list[dict]
+    data: dict
 
 
 class DocumentAccessRole(Enum):
