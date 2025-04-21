@@ -26,14 +26,14 @@ optional = true
 [tool.poetry.group.test.dependencies]
 pytest = "^8.3.5"
 
-[tool.poetry.group.cli_tools]
+[tool.poetry.group.cli-tools]
 optional = true
 
-[tool.poetry.group.cli_tools.dependencies]
+[tool.poetry.group.cli-tools.dependencies]
 faker = "^37.1.0"
 
 [tool.poetry.scripts]
-clitools = "scripts.cli:main"
+cli-tools = "scripts.cli:main"
 
 [build-system]
 requires = ["poetry-core"]

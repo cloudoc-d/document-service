@@ -4,6 +4,7 @@ from app.routers.styles import router as styles_router
 from contextlib import asynccontextmanager
 from app.scheduler import scheduler
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     scheduler.start()
