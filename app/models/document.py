@@ -8,14 +8,18 @@ from .user import User
 from .common import PyObjectId
 
 
+class DocElementType(str, Enum):
+    PARAGRAPH = 'paragraph'
+    HEADER = 'header'
+
 
 class DocElement(BaseModel):
-    type: str   # maybe enum
+    type: DocElementType
     attrs: dict
     data: dict
 
 
-class DocumentAccessRole(Enum):
+class DocumentAccessRole(str, Enum):
     READER = 'reader'
     EDITOR = 'editor'
 
@@ -29,7 +33,7 @@ class DocumentInfo(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
     owner_id: str
     name: str
-    style_id: Optional[PyObjectId] = Field(default=None)
+    style_id: str
     is_public: bool = Field(default=False)
     access_restrictions: list[DocumentAccessRestriction] = Field(default=list())
     created_at: datetime

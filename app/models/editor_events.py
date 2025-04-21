@@ -1,12 +1,7 @@
 from pydantic import BaseModel, Field
 from enum import Enum
 from typing import Literal, Union
-
-
-class BlockType(Enum):
-    PARAGRAPH = 'paragraph'
-    HEADER = 'header'
-
+from app.models.document import DocElementType as BlockType
 
 
 class BlockChangedData(BaseModel):

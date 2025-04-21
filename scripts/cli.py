@@ -1,6 +1,5 @@
 import argparse
-from commands.documents import generate_documents
-from commands.styles import generate_styles
+from scripts.commands.documents import fill_documents_collection
 import os
 
 def get_mongo_db_url() -> str:
@@ -13,40 +12,50 @@ def main():
     # Documents command
     docs_parser = subparsers.add_parser('generate_documents', help='Generate documents')
     docs_parser.add_argument('count', type=int, help='Number of documents to generate')
-    styles_parser.add_argument(
+    docs_parser.add_argument(
         'mongodb_url',
         type=str,
-        default=get_mongo_db_url,
+        nargs='?',
+        default=get_mongo_db_url(),
         help='Url to mongodb database (default: env.MONGODB_URL)'
     )
-    styles_parser.add_argument(
+    docs_parser.add_argument(
+        'user_id',
+        type=str,
+        nargs='?',
+        default=None,
+        help='Document owner. If None, a random id is assigned (default: None)',
+    )
+    docs_parser.add_argument(
         'database',
         type=str,
+        nargs='?',
         default='cloudoc',
         help="MongoDB database name (default: cloudoc)"
     )
-    styles_parser.add_argument(
+    docs_parser.add_argument(
         'collection',
         type=str,
+        nargs='?',
         default='documents',
         help="Documents collection name (default: documents)"
     )
-    docs_parser.set_defaults(func=generate_documents)
-
-    # Styles command
-    styles_parser = subparsers.add_parser('generate_styles', help='Generate styles')
-    styles_parser.add_argument(
-        'count',
-        type=int,
-        help='Number of styles to generate'
-    )
-    styles_parser.add_argument(
-        'mongodb_url',
+    docs_parser.add_argument(
+        'style_collection',
         type=str,
-        default=get_mongo_db_url,
-        help='Url to mongodb database (default: env.MONGODB_URL)'
+        nargs='?',
+        default='styles',
+        help="Styles collection name (default: styles)"
     )
-    styles_parser.set_defaults(func=generate_styles)
+    docs_parser.add_argument(
+        'assign_existing_style',
+        type=bool,
+        nargs='?',
+        default=True,
+        help="Should existing style_id be assigned to document (default: true)",
+    )
+    docs_parser.set_defaults(func=fill_documents_collection)
+
 
     args = parser.parse_args()
 
