@@ -9,6 +9,7 @@ from app.models.document import Document
 from app.database import documents_collection
 from bson import ObjectId
 
+
 @scheduler.scheduled_job('interval', minutes=10)
 async def push_cache_to_db():
     for key in redis_client.scan(match="document:*"):

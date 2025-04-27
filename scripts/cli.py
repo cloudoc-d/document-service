@@ -1,9 +1,10 @@
 import argparse
 from scripts.commands.documents import fill_documents_collection
+from app.config import Config
 import os
 
 def get_mongo_db_url() -> str:
-    return os.getenv('MONGODB_URL')
+    return Config.MONGODB_URL
 
 def main():
     parser = argparse.ArgumentParser(description="Manager CLI")
@@ -17,7 +18,7 @@ def main():
         type=str,
         nargs='?',
         default=get_mongo_db_url(),
-        help='Url to mongodb database (default: env.MONGODB_URL)'
+        help=f'Url to mongodb database (default: {get_mongo_db_url()})'
     )
     docs_parser.add_argument(
         'user_id',

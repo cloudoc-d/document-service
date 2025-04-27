@@ -7,7 +7,6 @@ from fastapi import (
 from bson import ObjectId
 
 from app.models.editor_events import Event, EventsCollection
-from app.database import documents_collection as collection
 from app.models.document import (
     Document,
     DocumentAccessRestriction,
@@ -15,7 +14,7 @@ from app.models.document import (
 )
 from app.models.user import User
 from app.broadcast import broadcast
-from app.routers.auth_utils import ActiveUserAnnotation
+from app.dependencies.user import ActiveUserAnnotation
 from app.redis import redis_client
 from app.routers.cache import get_document, set_document_in_cache
 

@@ -9,8 +9,8 @@ from app.models.style import (
     StyleUpdate,
     Style,
 )
-from app.routers.auth_utils import ActiveUserAnnotation
-from app.database import styles_collection as collection
+from app.dependencies.database import StylesCollectionAnnotation
+from app.dependencies.user import ActiveUserAnnotation
 from app.routers.utils import update_record_from_model
 from datetime import datetime
 from typing import Optional
@@ -22,6 +22,7 @@ from typing import Optional
     response_model_by_alias=False,
 )
 async def get_styles(
+    collection: StylesCollectionAnnotation,
     user: ActiveUserAnnotation,
     limit: int = 10,
     offset: int = 0,
@@ -65,6 +66,7 @@ async def get_styles(
     response_model_by_alias=False,
 )
 async def create_style(
+    collection: StylesCollectionAnnotation,
     user: ActiveUserAnnotation,
     document_create: StyleCreate,
 ):
@@ -88,6 +90,7 @@ async def create_style(
     response_model_by_alias=False,
 )
 async def update_style(
+    collection: StylesCollectionAnnotation,
     user: ActiveUserAnnotation,
     style_id: str,
     style_update: StyleUpdate,
@@ -114,7 +117,11 @@ async def update_style(
     response_model=Style,
     response_model_by_alias=False,
 )
-async def get_style(user: ActiveUserAnnotation, style_id: str):
+async def get_style(
+    collection: StylesCollectionAnnotation,
+    user: ActiveUserAnnotation,
+    style_id: str
+):
     style = await collection.find({"_id": ObjectId(style_id)})
     if style is None:
         raise HTTPException(
@@ -134,7 +141,11 @@ async def get_style(user: ActiveUserAnnotation, style_id: str):
     path='/{style_id}',
     status_code=status.HTTP_204_NO_CONTENT,
 )
-async def delete_style(user: ActiveUserAnnotation, style_id: str):
+async def delete_style(
+    collection: StylesCollectionAnnotation,
+    user: ActiveUserAnnotation,
+    style_id: str
+):
     deleted_style = await collection.delete_one(
         {"_id": ObjectId(style_id), "owner_id": user.id}
     )

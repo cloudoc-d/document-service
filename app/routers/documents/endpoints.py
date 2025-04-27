@@ -1,4 +1,3 @@
-from app.routers.utils import update_record_from_model
 from .router import router
 
 from fastapi import (
@@ -13,8 +12,9 @@ from fastapi import (
 
 from typing import Annotated
 from bson import ObjectId
+from typing import Optional
+import datetime
 
-from app.database import documents_collection as collection
 from app.models.document import (
     Document,
     DocumentInfo,
@@ -23,10 +23,9 @@ from app.models.document import (
     DocumentUpdate,
 )
 from app.models.user import User
-from app.routers.auth_utils import get_active_user, ActiveUserAnnotation
-from typing import Optional
-
-import datetime
+from app.dependencies.user import ActiveUserAnnotation
+from app.dependencies.database import DocumentsCollectionAnnotation
+from app.routers.utils import update_record_from_model
 
 
 @router.get(
@@ -36,6 +35,7 @@ import datetime
 )
 async def get_documents(
     user: ActiveUserAnnotation,
+    collection: DocumentsCollectionAnnotation,
     limit: int = 25,
     offset: int = 0,
     name: Optional[str] = None,
@@ -50,7 +50,7 @@ async def get_documents(
             "$options": "i"
         }
 
-    styles = await collection.find(
+    documents = await collection.find(
         filter_conditions,
         {'content': 0}
     ).skip(offset).limit(limit).to_list(None)
@@ -60,8 +60,8 @@ async def get_documents(
     )
 
     return DocumentInfoCollection(
-        styles=styles,
-        presented_amount=len(styles),
+        documents=documents,
+        presented_amount=len(documents),
         total_amount=total_amount
     )
 
@@ -73,6 +73,7 @@ async def get_documents(
     response_model_by_alias=False,
 )
 async def create_document(
+    collection: DocumentsCollectionAnnotation,
     user: ActiveUserAnnotation,
     document_create: DocumentCreate
 ):
@@ -92,12 +93,13 @@ async def create_document(
     return created_doc
 
 
-@router.put(
+@router.patch(
     path='/{document_id}',
     response_model=Document,
     response_model_by_alias=False,
 )
 async def update_document(
+    collection: DocumentsCollectionAnnotation,
     user: ActiveUserAnnotation,
     document_id: str,
     document_update: DocumentUpdate,
@@ -124,7 +126,11 @@ async def update_document(
     response_model=Document,
     response_model_by_alias=False,
 )
-async def get_document(user: ActiveUserAnnotation, document_id: str):
+async def get_document(
+    collection: DocumentsCollectionAnnotation,
+    user: ActiveUserAnnotation,
+    document_id: str
+):
     doc = await collection.find_one(
         {'_id': ObjectId(document_id), 'owner_id': user.id}
     )
@@ -136,11 +142,16 @@ async def get_document(user: ActiveUserAnnotation, document_id: str):
 
     return doc
 
+
 @router.delete(
     path='/{document_id}',
     status_code=status.HTTP_204_NO_CONTENT,
 )
-async def delete_document(user: ActiveUserAnnotation, document_id: str):
+async def delete_document(
+    collection: DocumentsCollectionAnnotation,
+    user: ActiveUserAnnotation,
+    document_id: str
+):
     del_result = await collection.delete_one(
         {'_id': ObjectId(document_id), 'owner_id': user.id}
     )
