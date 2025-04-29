@@ -9,3 +9,5 @@ class Config:
     CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'redis://locahost:6379/')
 
     REDIS_STORAGE_URL = os.getenv('REDIS_STORAGE_URL', 'redis://locahost:6379/')
+
+    DATABASE_NAME = 'cloudoc'
