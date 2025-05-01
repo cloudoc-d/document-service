@@ -1,7 +1,6 @@
 from pydantic import BaseModel
 from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorCollection
-from typing import Any
 
 import pydantic
 
@@ -18,9 +17,9 @@ async def update_record_from_model(
     collection: AsyncIOMotorCollection,
     filter: dict,
     update_model: BaseModel,
-) -> Any | None:   # TODO what is it actually?
-    # Note: model field names should correspond to db record fields
-    update_fields =_get_model_fields(update_model)
+) -> dict | None:
+    # NOTE: model field names should correspond to db record fields
+    update_fields = _get_model_fields(update_model)
 
     result = None
 

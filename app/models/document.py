@@ -16,7 +16,7 @@ class DocElementType(str, Enum):
 class DocElement(BaseModel):
     type: DocElementType
     attrs: dict
-    data: dict
+    data: dict  # NOTE No validation ? (
 
 
 class DocumentAccessRole(str, Enum):
@@ -59,5 +59,5 @@ class DocumentCreate(BaseModel):
 
 
 class DocumentUpdate(BaseModel):
-    name: str | None
-    style_id: str | None
+    name: str | None = Field(default=None)
+    style_id: str | None = Field(default=None)

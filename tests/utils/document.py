@@ -20,6 +20,7 @@ def create_document(
     editor_ids: list[str] | None = None,
     created_at: datetime | None = None,
     edited_at: datetime | None = None,
+    content: list[dict] | None = None
 ) -> Document:
     access_restrictions = list()
     if reader_ids:
@@ -41,7 +42,8 @@ def create_document(
         is_public=is_public,
         access_restrictions=access_restrictions,
         created_at=created_at if created_at else datetime.now(),
-        edited_at=edited_at
+        edited_at=edited_at,
+        content=content if content else list()
     )
 
     return document
@@ -62,8 +64,15 @@ def _get_access_restrictions(
     return result
 
 
-def insert_document_in_database(document: Document) -> None:
+def insert_document(document: Document) -> None:
     with pymongo.MongoClient(Config.MONGODB_URL) as client:
         database = client.get_database(Config.DATABASE_NAME)
         collection = database.get_collection(DOCUMENTS_COLLECTION)
-        collection.insert_one(document.model_dump(by_alias=True))
+        model_dump = document.model_dump(by_alias=True)
+        model_dump['_id'] = ObjectId(model_dump['_id'])
+        collection.insert_one(model_dump)
+
+
+def insert_documents_in_bulk(documents: list[Document]) -> None:
+    for doc in documents:
+        insert_document(doc)

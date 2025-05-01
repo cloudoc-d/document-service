@@ -17,7 +17,7 @@ def client():
         yield client
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def active_user() -> 'User':
     user = create_user(is_active=True)
     override_target_app_user(user)

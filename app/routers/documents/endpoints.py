@@ -7,6 +7,7 @@ from fastapi import (
     Response,
     WebSocket,
     WebSocketException,
+    Query,
     status
 )
 
@@ -36,8 +37,8 @@ from app.routers.utils import update_record_from_model
 async def get_documents(
     user: ActiveUserAnnotation,
     collection: DocumentsCollectionAnnotation,
-    limit: int = 25,
-    offset: int = 0,
+    limit: Annotated[int, Query(gt=-1)] = 25,
+    offset: Annotated[int, Query(gt=-1)] = 0,
     name: Optional[str] = None,
 ):
     filter_conditions = {
@@ -50,10 +51,14 @@ async def get_documents(
             "$options": "i"
         }
 
-    documents = await collection.find(
-        filter_conditions,
-        {'content': 0}
-    ).skip(offset).limit(limit).to_list(None)
+    # NOTE .limit method returns one element on limit=0 (idk why)
+    if limit > 0:
+        documents = await collection.find(
+            filter_conditions,
+            {'content': 0}
+        ).skip(offset).limit(limit).to_list(None)
+    else:
+        documents = list()
 
     total_amount = await collection.count_documents(
         filter=filter_conditions
@@ -104,7 +109,7 @@ async def update_document(
     document_id: str,
     document_update: DocumentUpdate,
 ):
-    document = update_record_from_model(
+    document = await update_record_from_model(
         collection=collection,
         update_model=document_update,
         filter={
@@ -115,7 +120,7 @@ async def update_document(
     if document is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detayil="document not found"
+            detail="document not found"
         )
 
     return document
