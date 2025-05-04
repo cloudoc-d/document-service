@@ -1,4 +1,5 @@
 import typing
+from typing_extensions import Sequence
 import pytest
 from fastapi import status
 
@@ -14,29 +15,35 @@ class CRUDTestingSuite:
     def model_name(self) -> str:
        raise NotImplementedError()
 
-
     @property
     def creation_payload(self) -> dict[str, typing.Any]:
         raise NotImplementedError()
-
 
     @property
     def update_payload(self) -> dict[str, typing.Any]:
         raise NotImplementedError()
 
-
     @property
     def model_content_data(self) -> typing.Any:
         raise NotImplementedError()
 
-
-    @staticmethod
-    def create_model(self, owner_id: typing.Any, *args, **kwargs) -> 'BaseModel':
+    def create_model(
+        self,
+        owner_id: typing.Any,
+        content: typing.Any | None = None
+    ) -> 'BaseModel':
         raise NotImplementedError()
 
-    @staticmethod
     def insert_model(self, model: 'BaseModel') -> None:
         raise NotImplementedError()
+
+    @property
+    def required_fields(self) -> Sequence[str]:
+        return ("id", "name", "owner_id", "created_at", "is_deleted")
+
+    @property
+    def additional_required_fields(self) -> Sequence[str]:
+        return ()
 
     def insert_models_bulk(self, models: list['BaseModel']) -> None:
         for m in models:
@@ -47,7 +54,12 @@ class CRUDTestingSuite:
         data: dict,
         owner_id: typing.Any
     ) -> None:
-        raise NotImplementedError()
+        fields = self.required_fields + self.additional_required_fields
+        for field in fields:
+            assert field in data, f"Missing required field in response json: {field}"
+
+        if 'owner_id' in self.required_fields:
+            assert data['owner_id'] == owner_id, "owner_id doesn't correspond to provided document"
 
     def assert_models_integrity_bulk(
         self,

@@ -20,7 +20,7 @@ class StyleInfo(crud_models.ReadInfoModel):
 
     public: bool = Field(default=False)
     updated_at: Optional[datetime] = Field(default=None)
-    poplularity: int = Field(default=0)
+    popularity: int = Field(default=0)
 
 
 class Style(crud_models.ReadContentModel, StyleInfo):
@@ -37,5 +37,5 @@ class StyleCreate(crud_models.CreateModel):
     name: str = NameField
 
 class StyleUpdate(BaseModel):
-    name: str | None
-    content: StyleContent | None
+    name: str | None = Field(default=None)
+    content: StyleContent | None = Field(default=None)

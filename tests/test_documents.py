@@ -4,8 +4,7 @@ import typing
 
 
 if typing.TYPE_CHECKING:
-    from fastapi.testclient import TestClient
-    from app.models.user import User
+    from app.models.document import Document
 
 
 class TestDocumentCRUD(CRUDTestingSuite):
@@ -20,12 +19,16 @@ class TestDocumentCRUD(CRUDTestingSuite):
         }
     ]
 
-    create_model = staticmethod(create_document)
-    insert_model = staticmethod(insert_document)
-
-    def assert_model_integrity(
+    def create_model(
         self,
-        data: dict,
-        owner_id: typing.Any
-    ) -> None:
-        ...
+        owner_id: str,
+        content: dict | None = None
+    ) -> 'Document':
+        return create_document(owner_id=owner_id, content=content)
+
+    def insert_model(self, model: 'Document') -> None:
+        insert_document(model)
+
+    additional_required_fields = (
+        'style_id', 'is_public', 'access_restrictions', 'edited_at'
+    )

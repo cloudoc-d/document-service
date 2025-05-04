@@ -32,6 +32,7 @@ def create_style(
     owner_id: str | None = None,
     created_at: datetime | None = None,
     updated_at: datetime | None = None,
+    is_deleted: bool = False,
     public: bool = False,
     popularity: int = 0,
 ) -> Style:
@@ -43,7 +44,8 @@ def create_style(
         owner_id=owner_id if owner_id else generate_rand_str(),
         created_at=created_at if created_at else datetime.now(),
         updated_at=updated_at if updated_at else None,
-        popularity=popularity
+        popularity=popularity,
+        is_deleted=False,
     )
 
 
