@@ -1,13 +1,8 @@
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-
-
-scheduler = AsyncIOScheduler(timezone='UTC')
-
-
 from app.redis import redis_client
 from app.models.document import Document
 from app.database import documents_collection
 from bson import ObjectId
+from .scheduler import scheduler
 
 
 @scheduler.scheduled_job('interval', minutes=10)
