@@ -4,7 +4,8 @@ from app.main import app as target_app
 from fastapi.testclient import TestClient
 from tests.utils.user import (
     create_user,
-    override_target_app_user
+    override_target_app_user,
+    clear_target_app_user_override
 )
 
 if typing.TYPE_CHECKING:
@@ -21,4 +22,5 @@ def client():
 def active_user() -> 'User':
     user = create_user(is_active=True)
     override_target_app_user(user)
-    return user
+    yield user
+    clear_target_app_user_override()

@@ -11,7 +11,7 @@ async def lifespan(app: FastAPI):
     scheduler.start()
     yield
     scheduler.shutdown()
-    mongo_client.close()
+    await mongo_client.close()
 
 app = FastAPI(lifespan=lifespan)
 

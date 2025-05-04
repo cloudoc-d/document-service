@@ -1,4 +1,4 @@
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, status
 from typing import Annotated
 
 from app.models.user import User, UserRole
@@ -8,7 +8,7 @@ def get_user(access_token: str | None = None) -> User:
     # raises HTTPException
     if access_token is None:
         raise HTTPException(
-            status_code=403,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail="access_token must be provided"
         )
     # TODO глушилка, жду доку к сервису авторизации
@@ -23,7 +23,7 @@ def get_user(access_token: str | None = None) -> User:
             is_active=True
         )
     raise HTTPException(
-        status_code=403,
+        status_code=status.HTTP_401_UNAUTHORIZED,
         detail="access_token is invalid"
     )
 

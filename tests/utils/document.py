@@ -1,4 +1,3 @@
-import pymongo
 from bson.objectid import ObjectId
 from app.models.document import (
     Document,
@@ -6,9 +5,11 @@ from app.models.document import (
     DocumentAccessRole,
 )
 from app.database import DOCUMENTS_COLLECTION
-from app.config import Config
 from datetime import datetime
-from .common import generate_rand_str
+from .common import (
+    generate_rand_str,
+    insert_model_in_database
+)
 
 
 def create_document(
@@ -16,6 +17,7 @@ def create_document(
     name: str | None = None,
     style_id: str | None = None,
     is_public: bool = False,
+    is_deleted: bool = False,
     reader_ids: list[str] | None = None,
     editor_ids: list[str] | None = None,
     created_at: datetime | None = None,
@@ -36,12 +38,13 @@ def create_document(
 
     document = Document(
         id=ObjectId(),
-        owner_id=owner_id if owner_id else generate_rand_str(),
         name=name if name else generate_rand_str(),
+        owner_id=owner_id if owner_id else generate_rand_str(),
+        created_at=created_at if created_at else datetime.now(),
+        is_deleted=is_deleted,
         style_id=ObjectId(style_id) if style_id else None,
         is_public=is_public,
         access_restrictions=access_restrictions,
-        created_at=created_at if created_at else datetime.now(),
         edited_at=edited_at,
         content=content if content else list()
     )
@@ -65,12 +68,7 @@ def _get_access_restrictions(
 
 
 def insert_document(document: Document) -> None:
-    with pymongo.MongoClient(Config.MONGODB_URL) as client:
-        database = client.get_database(Config.DATABASE_NAME)
-        collection = database.get_collection(DOCUMENTS_COLLECTION)
-        model_dump = document.model_dump(by_alias=True)
-        model_dump['_id'] = ObjectId(model_dump['_id'])
-        collection.insert_one(model_dump)
+    insert_model_in_database(document, DOCUMENTS_COLLECTION)
 
 
 def insert_documents_in_bulk(documents: list[Document]) -> None:

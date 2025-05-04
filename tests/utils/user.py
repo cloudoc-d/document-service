@@ -1,6 +1,7 @@
 from datetime import datetime
 from app.models.user import User, UserRole
 import app.dependencies.user
+from app.main import app as target_app
 from .common import generate_rand_str
 
 
@@ -23,9 +24,11 @@ def create_user(
 
 
 def override_target_app_user(user: User) -> None:
-    from app.main import app as target_app
-
     def get_user() -> User:
         return user
 
     target_app.dependency_overrides[app.dependencies.user.get_user] = get_user
+
+
+def clear_target_app_user_override() -> None:
+    target_app.dependency_overrides.pop(app.dependencies.user.get_user)
