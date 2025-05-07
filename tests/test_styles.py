@@ -16,9 +16,11 @@ class TestStyleCRUD(CRUDTestingSuite):
     def create_model(
         self,
         owner_id: str,
-        content: dict | None = None
+        content: str | None = None
     ) -> 'Style':
-        return create_style(owner_id=owner_id, content=content)
+        f = create_style(owner_id=owner_id, content=content)
+        print(f)
+        return f
 
     def insert_model(self, model: 'Style') -> None:
         insert_style(model)

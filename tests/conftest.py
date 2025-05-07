@@ -19,7 +19,7 @@ def client():
 
 
 @pytest.fixture
-def active_user() -> 'User':
+def active_user() -> typing.Generator['User', None, None]:
     user = create_user(is_active=True)
     override_target_app_user(user)
     yield user

@@ -23,8 +23,8 @@ class StyleInfo(crud_models.ReadInfoModel):
     popularity: int = Field(default=0)
 
 
-class Style(crud_models.ReadContentModel, StyleInfo):
-    content: StyleContent
+class Style(StyleInfo, crud_models.ReadContentModel):
+    content: StyleContent = Field(default="")
 
 
 class StyleInfoCollection(crud_models.CollectionModel):

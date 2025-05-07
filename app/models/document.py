@@ -47,7 +47,7 @@ class DocumentInfo(crud_models.ReadInfoModel):
     )
 
 
-class Document(crud_models.ReadContentModel, DocumentInfo):
+class Document(DocumentInfo, crud_models.ReadContentModel):
     content: list[DocElement] = Field(default=[])
 
 

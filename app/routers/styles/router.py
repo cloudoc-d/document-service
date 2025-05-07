@@ -8,14 +8,14 @@ from app.models.style import (
     StyleUpdate,
 )
 from app.database import styles_repository
-from app.dependencies.user import get_active_user
+from app.dependencies.user import active_user_dependency
 
 
 _crud_router = CRUDRouter(
     prefix="/styles",
     tags=["styles"],
     repository=styles_repository,
-    user_dependency=get_active_user,
+    user_dependency=active_user_dependency,
     read_schema=Style,
     read_info_schema=StyleInfo,
     collection_schema=StyleInfoCollection,
@@ -23,7 +23,6 @@ _crud_router = CRUDRouter(
     update_schema=StyleUpdate,
     schema_name="style",
     default_content="",
-    id_type=str
 )
 
 router = _crud_router.router

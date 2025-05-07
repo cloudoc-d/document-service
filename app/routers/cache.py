@@ -26,20 +26,17 @@ async def _get_document_from_mongodb(
 async def get_document(
     document_id: str,
 ) -> Document | None:
-
     document_key = _get_document_key(document_id)
-    doc_redis_record: str | None = redis_client.get(document_key)
 
-    document: Document = None
-    if doc_redis_record is None:
+    document: Document | None = None
+    if doc_redis_record := redis_client.get(document_key):
+        document = Document.model_validate_json(doc_redis_record)
+    else:
         document = await _get_document_from_mongodb(
             bson.ObjectId(document_id)
         )
-        if document is None:
-            return None
-        redis_client.set(document_key, document.json())
-    else:
-        document = Document.model_validate_json(doc_redis_record)
+        if document is not None:
+            redis_client.set(document_key, document.model_dump_json())
 
     return document
 
@@ -50,4 +47,4 @@ async def set_document_in_cache(
 ) -> None:
     document_key = _get_document_key(document_id)
 
-    redis_client.set(document_key, document)
+    redis_client.set(document_key, document.model_dump_json())

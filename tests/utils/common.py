@@ -22,7 +22,6 @@ def insert_model_in_database(
     with pymongo.MongoClient(Config.MONGODB_URL) as client:
         database = client.get_database(Config.DATABASE_NAME)
         collection = database.get_collection(collection_name)
-        model_dump = model.model_dump()
-        #TODO hotfix, change asap
-        model_dump['_id'] = model_dump.pop('id')
+        model_dump = model.model_dump(by_alias=True)
+        model_dump['_id'] = ObjectId(model_dump['_id'])
         collection.insert_one(model_dump)

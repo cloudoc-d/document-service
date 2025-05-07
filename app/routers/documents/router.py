@@ -1,6 +1,6 @@
 from app.crud_router import CRUDRouter
 from app.database import documents_repository
-from app.dependencies.user import get_active_user
+from app.dependencies.user import active_user_dependency
 from app.models.document import (
     Document,
     DocumentCreate,
@@ -13,7 +13,7 @@ _crud_router = CRUDRouter(
     prefix='/documents',
     tags=['documents'],
     repository=documents_repository,
-    user_dependency=get_active_user,
+    user_dependency=active_user_dependency,
     read_schema=Document,
     create_schema=DocumentCreate,
     update_schema=DocumentUpdate,
@@ -26,4 +26,5 @@ router = _crud_router.router
 
 
 from .endpoints import *
-from .endpoints_ws import *
+# from .endpoints_ws import *
+from .endpoints_ws import edit_document_ws

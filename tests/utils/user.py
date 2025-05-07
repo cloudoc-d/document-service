@@ -27,8 +27,8 @@ def override_target_app_user(user: User) -> None:
     def get_user() -> User:
         return user
 
-    target_app.dependency_overrides[app.dependencies.user.get_user] = get_user
+    target_app.dependency_overrides[app.dependencies.user.user_dependency] = get_user
 
 
 def clear_target_app_user_override() -> None:
-    target_app.dependency_overrides.pop(app.dependencies.user.get_user)
+    target_app.dependency_overrides.pop(app.dependencies.user.user_dependency)

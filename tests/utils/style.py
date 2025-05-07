@@ -1,6 +1,6 @@
 from app.models.style import Style
 from datetime import datetime
-from bson import ObjectId
+from bson.objectid import ObjectId
 from tests.utils.common import (
     generate_rand_str,
     insert_model_in_database,
@@ -37,7 +37,7 @@ def create_style(
     popularity: int = 0,
 ) -> Style:
     return Style(
-        id=ObjectId(),
+        _id=ObjectId(), # TODO почему по алиасу ???
         content=content if content else _default_content(),
         public=public,
         name=name if name else generate_rand_str(),

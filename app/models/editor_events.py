@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from enum import Enum
-from typing import Literal, Union
+from typing import Literal, Union, Annotated
 from app.models.document import DocElementType as BlockType
 
 
@@ -47,12 +47,16 @@ class BlockRemovedEvent(BaseModel):
     data: BlockRemovedData
 
 
-Event = Union[
-    BlockChangedEvent,
-    BlockAddedEvent,
-    BlockMovedEvent,
-    BlockRemovedEvent
-]
+class Event(BaseModel):
+    event: Annotated[
+        Union[
+            BlockChangedEvent,
+            BlockAddedEvent,
+            BlockMovedEvent,
+            BlockRemovedEvent
+        ],
+        Field(discriminator='type')
+    ]
 
 
 class EventsCollection(BaseModel):

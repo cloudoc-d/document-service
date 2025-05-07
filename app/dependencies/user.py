@@ -1,15 +1,26 @@
-from fastapi import Depends, HTTPException, status
-from typing import Annotated
+from fastapi import (
+    WebSocket, Request, Depends,
+    WebSocketException, HTTPException, status
+)
+import typing
+import enum
 
 from app.models.user import User, UserRole
+from ._context import ContextAnnotation, get_context_based_exception
 
 
-def get_user(access_token: str | None = None) -> User:
+
+def user_dependency(
+    connection_context: ContextAnnotation,
+    access_token: str | None = None,
+) -> User:
     # raises HTTPException
     if access_token is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="access_token must be provided"
+        raise get_context_based_exception(
+            context=connection_context,
+            http_code=status.HTTP_401_UNAUTHORIZED,
+            ws_code=status.WS_1008_POLICY_VIOLATION,
+            message="access_token must be provided"
         )
     # TODO глушилка, жду доку к сервису авторизации
     from datetime import datetime
@@ -22,30 +33,53 @@ def get_user(access_token: str | None = None) -> User:
             created_at=datetime.now(),
             is_active=True
         )
+
+    raise get_context_based_exception(
+        context=connection_context,
+        http_code=status.HTTP_401_UNAUTHORIZED,
+        ws_code=status.WS_1008_POLICY_VIOLATION,
+        message="access_token is invalid",
+    )
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="access_token is invalid"
     )
 
 
-UserAnnotation = Annotated[User, Depends(get_user)]
+UserAnnotation = typing.Annotated[User, Depends(user_dependency)]
 
 
-def get_active_user(user: UserAnnotation) -> User:
+def active_user_dependency(
+    connection_context: ContextAnnotation,
+    user: UserAnnotation
+) -> User:
     # raises HTTPException
     if not user.is_active:
-        raise HTTPException(status_code=403, details="inactive user")
+        raise get_context_based_exception(
+            context=connection_context,
+            http_code=status.HTTP_403_FORBIDDEN,
+            ws_code=status.WS_1008_POLICY_VIOLATION,
+            message="inactive user"
+        )
     return user
 
 
-ActiveUserAnnotation = Annotated[User, Depends(get_active_user)]
+ActiveUserAnnotation = typing.Annotated[User, Depends(active_user_dependency)]
 
 
-def get_admin_user(user: UserAnnotation) -> User:
+def admin_user_dependency(
+    connection_context: ContextAnnotation,
+    user: UserAnnotation
+) -> User:
     # raises HTTPException
     if UserRole.ADMIN not in user.roles:
-        raise HTTPException(status_code=403, details="not an admin")
+        raise get_context_based_exception(
+            context=connection_context,
+            http_code=status.HTTP_403_FORBIDDEN,
+            ws_code=status.WS_1008_POLICY_VIOLATION,
+            details="not an admin"
+        )
     return user
 
 
-AdminUserAnnotation = Annotated[User, Depends(get_admin_user)]
+AdminUserAnnotation = typing.Annotated[User, Depends(admin_user_dependency)]
