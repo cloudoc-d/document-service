@@ -4,6 +4,15 @@ from typing import Literal, Union, Annotated
 from app.models.document import DocElementType as BlockType
 
 
+class EventType(str, Enum):
+    BLOCK_CHANGED = "block-changed"
+    BLOCK_ADDED = "block-added"
+    BLOCK_MOVED = "block-moved"
+    BLOCK_REMOVED = "block-removed"
+    BLOCK_LOCKED = "block-locked"
+    BLOCK_RELEASED = "block-released"
+
+
 class BlockChangedData(BaseModel):
     index: int
     data: dict
@@ -26,26 +35,45 @@ class BlockRemovedData(BaseModel):
     index: int
     id: str
 
+class BlockLockedData(BaseModel):
+    id: str
+
+class BlockReleasedData(BaseModel):
+    id: str
 
 class BlockChangedEvent(BaseModel):
-    type: Literal["block-changed"]
+    type: Literal[EventType.BLOCK_CHANGED]
     data: BlockChangedData
 
 
 class BlockAddedEvent(BaseModel):
-    type: Literal["block-added"]
+    type: Literal[EventType.BLOCK_ADDED]
     data: BlockAddedData
 
 
 class BlockMovedEvent(BaseModel):
-    type: Literal["block-moved"]
+    type: Literal[EventType.BLOCK_MOVED]
     data: BlockMovedData
 
 
 class BlockRemovedEvent(BaseModel):
-    type: Literal["block-removed"]
+    type: Literal[EventType.BLOCK_REMOVED]
     data: BlockRemovedData
 
+
+class BlockLockedEvent(BaseModel):
+    type: Literal[EventType.BLOCK_LOCKED]
+    data: BlockLockedData
+
+
+class BlockReleasedEvent(BaseModel):
+    type: Literal[EventType.BLOCK_RELEASED]
+    data: BlockReleasedData
+
+
+class UserInfo(BaseModel):
+    id: str
+    name: str
 
 class Event(BaseModel):
     event: Annotated[
@@ -57,6 +85,7 @@ class Event(BaseModel):
         ],
         Field(discriminator='type')
     ]
+    user: UserInfo | None = Field(default=None)
 
 
 class EventsCollection(BaseModel):

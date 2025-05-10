@@ -2,7 +2,7 @@ from typing import Protocol, Type, Callable, Annotated, Optional, Any
 from fastapi import APIRouter, Depends, Query, HTTPException, status
 from pydantic import BaseModel
 from datetime import datetime
-from .repository.base import BaseRepository
+from ..repository.base import BaseRepository
 from .models import (
     ReadContentModel,
     CreateModel,
@@ -70,12 +70,14 @@ class CRUDRouter:
             limit: Annotated[int, Query(gt=-1)] = 25,
             offset: Annotated[int, Query(gt=-1)] = 0,
             name: Optional[str] = None,
+            is_deleted: bool = False,
         ):
             documents = await repository.get_documents(
                 limit=limit,
                 offset=offset,
                 name=name,
-                owner_id=user.id
+                owner_id=user.id,
+                is_deleted=is_deleted,
             )
             total_amount = await repository.count_documents(
                 name=name,
@@ -106,6 +108,7 @@ class CRUDRouter:
                 created_at=datetime.now(),
                 is_deleted=False,
                 content=self._default_content,
+                deleted_at=None,
             )
             return await repository.insert_document(
                 document=document.model_dump(by_alias=True, exclude=['id'])
@@ -158,7 +161,7 @@ class CRUDRouter:
             repository: Annotated[BaseRepository, Depends(self._get_repository)],
             id: self._id_type,  # type: ignore
         ):
-            is_deleted = await repository.delete_document(id=id, owner_id=user.id)
+            is_deleted = await repository.mark_document_as_deleted(id=id, owner_id=user.id)
             if not is_deleted:
                 self._raise_not_found_exception(id)
 

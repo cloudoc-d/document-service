@@ -15,7 +15,7 @@ documents_collection = database.get_collection(DOCUMENTS_COLLECTION)
 styles_collection = database.get_collection(STYLES_COLLECTION)
 
 
-from app.crud_router.repository.mongo import MongoRepository
+from app.core.repository.mongo import MongoRepository
 
 documents_repository = MongoRepository(documents_collection)
 styles_repository = MongoRepository(styles_collection)

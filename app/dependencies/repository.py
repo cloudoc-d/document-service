@@ -1,6 +1,6 @@
 from fastapi import Depends
 from app.database import documents_repository, styles_repository
-from app.crud_router.repository.mongo import MongoRepository
+from app.core.repository.mongo import MongoRepository
 import typing
 
 

@@ -9,6 +9,7 @@ class ReadInfoModel(BaseModel):
     owner_id: Any
     created_at: datetime
     is_deleted: bool
+    deleted_at: datetime | None = Field(default=None)
 
 
 class ReadContentModel(ReadInfoModel):

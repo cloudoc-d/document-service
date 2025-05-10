@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.crud_router import CRUDRouter
+from app.core.crud_router import CRUDRouter
 from app.models.style import (
     StyleInfo,
     Style,

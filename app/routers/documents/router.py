@@ -1,4 +1,4 @@
-from app.crud_router import CRUDRouter
+from app.core.crud_router import CRUDRouter
 from app.database import documents_repository
 from app.dependencies.user import active_user_dependency
 from app.models.document import (

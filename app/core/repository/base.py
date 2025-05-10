@@ -27,7 +27,7 @@ class BaseRepository(ABC):
         self,
         id: typing.Any,
         owner_id: typing.Any | None,
-    ):
+    ) -> dict | None:
         ...
 
     @abstractmethod
@@ -43,7 +43,7 @@ class BaseRepository(ABC):
         id: typing.Any,
         changes: dict[str, typing.Any],
         owner_id: typing.Any
-    ) -> dict:
+    ) -> dict | None:
         ...
 
     @abstractmethod
@@ -52,4 +52,12 @@ class BaseRepository(ABC):
         id: typing.Any,
         owner_id: typing.Any,
     ) -> bool:
+        ...
+
+    @abstractmethod
+    async def mark_document_as_deleted(
+        self,
+        id: typing.Any,
+        owner_id: typing.Any,
+    ) -> dict | None:
         ...

@@ -4,6 +4,7 @@ import pymongo
 from pymongo.asynchronous.database import AsyncDatabase
 from pymongo.asynchronous.collection import AsyncCollection
 from typing import Any
+from datetime import datetime
 from bson import ObjectId
 
 
@@ -16,8 +17,9 @@ class MongoRepository(BaseRepository):
         owner_id: str,
         limit: int,
         offset: int,
+        is_deleted: bool = False,
         name: str | None = None,
-        exclude_fields: list[str] | None = None
+        exclude_fields: list[str] | None = None,
     ) -> list[dict]:
         if limit > 0:
             return await self._collection.find(
@@ -61,7 +63,7 @@ class MongoRepository(BaseRepository):
         id: str,
         changes: dict[str, Any],
         owner_id: str | None,
-    ) -> dict:
+    ) -> dict | None:
         valuable_fields = {k: v for k, v in changes.items() if v is not None}
 
         filter = self._construct_filter(id=id, owner_id=owner_id)
@@ -83,11 +85,19 @@ class MongoRepository(BaseRepository):
 
         return delete_result.deleted_count == 1
 
+    async def mark_document_as_deleted(self, id: str, owner_id: str | None) -> dict | None:
+        document = await self._collection.find_one_and_update(
+            filter=self._construct_filter(id=id, owner_id=owner_id),
+            update={"$set": {"is_deleted": True, "deleted_at": datetime.now()}}
+        )
+        return document
+
     def _construct_filter(
         self,
         id: str | ObjectId | None = None,
         owner_id: str | None = None,
         name: str | None = None,
+        is_deleted: bool | None = None,
     ) -> dict:
         filter = dict()
         if id is not None:
@@ -99,6 +109,8 @@ class MongoRepository(BaseRepository):
                "$regex": f".*{name}.*",
                "$options": "i"
            }
+        if is_deleted is not None:
+            filter["is_deleted"] = is_deleted
 
         return filter
 

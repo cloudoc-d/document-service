@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field, BeforeValidator, ConfigDict
 from datetime import datetime
 from typing import Annotated
 from enum import Enum
-import app.crud_router.models as crud_models
+import app.core.crud_router.models as crud_models
 
 from .user import User
 from .common import PyObjectId
@@ -36,6 +36,7 @@ class DocumentInfo(crud_models.ReadInfoModel):
     owner_id: str
     created_at: datetime
     is_deleted: bool = Field(default=False)
+    deleted_at: datetime | None = Field(default=None)
 
     style_id: Optional[PyObjectId] = Field(default=None)
     is_public: bool = Field(default=False)

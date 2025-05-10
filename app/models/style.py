@@ -1,7 +1,7 @@
 from typing import Optional, Annotated
 from datetime import datetime
 from pydantic import BaseModel, Field
-import app.crud_router.models as crud_models
+import app.core.crud_router.models as crud_models
 from .common import PyObjectId
 
 
@@ -17,6 +17,7 @@ class StyleInfo(crud_models.ReadInfoModel):
     owner_id: str
     created_at: datetime
     is_deleted: bool = Field(default=False)
+    deleted_at: datetime | None = Field(default=None)
 
     public: bool = Field(default=False)
     updated_at: Optional[datetime] = Field(default=None)
