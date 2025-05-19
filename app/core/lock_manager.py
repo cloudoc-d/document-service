@@ -67,13 +67,14 @@ class LockManager:
         return lock.locked and lock.owner_id == user_id
 
     async def _get_lock_data(self) -> dict:
-        data = await self._redis_client.get(self._storage_key)
+        data = self._redis_client.get(self._storage_key)
         return json.loads(data) if data else {}
 
     async def _get_lock(self, resource_id: str) -> LockRecord:
         locks = await self._get_lock_data()
-        record = locks.get(resource_id, {})
-        return LockRecord(**record)
+        record = locks.get(resource_id)
+        return LockRecord(locked=False, owner_id=None) \
+            if record is None else LockRecord(**record)
 
     async def _update_lock(
         self,
@@ -82,7 +83,7 @@ class LockManager:
     ) -> None:
         locks = await self._get_lock_data()
         locks[resource_id] = lock.model_dump()
-        await self._redis_client.set(
+        self._redis_client.set(
             self._storage_key,
             json.dumps(locks)
         )

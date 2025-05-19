@@ -29,23 +29,18 @@ def ws_client(
     with client.websocket_connect(url=url) as client:
         yield client
 
+
 def get_documents_edit_ws_url(document_id: str) -> str:
     return f"{DOCUMENTS_URL}/{document_id}/ws"
 
 
-from time import sleep
-def test_(
-    ws_client: 'WebSocketTestSession',
-):
-    added_event = {
+def test_unknown_event(ws_client: 'WebSocketTestSession'):
+    event = {
         "event": {
-            "type": "block-added",
-            "data": {
-                "index": 0,
-                "id": "asdfsdf",
-                "type": "paragraph",
-            },
+            "type": "unknown-event",
+            "data": {},
         }
     }
-    ws_client.send_json(added_event)
-    sleep(2)
+    ws_client.send_json(event)
+    response = ws_client.receive_json()
+    assert response["error"]["type"] == "unable-to-handle"

@@ -1,10 +1,16 @@
 import asyncio
 import typing
+import json
 from fastapi import WebSocket
 from broadcaster import Broadcast
 from dataclasses import dataclass
 from enum import Enum, auto
-from .message_handler import BaseMessageHandler, ResponseType
+from .message_handler import (
+    BaseMessageHandler,
+    Response,
+    ResponseType,
+    RequestHandlingException,
+)
 
 
 
@@ -29,11 +35,14 @@ class WSConnectionManager:
 
     async def _ws_recieve(self) -> None:
         async for message in self._websocket.iter_text():
-            response = await self._message_handler.handle_message(message)
+            try:
+                response = await self._message_handler.handle_message(message)
+            except RequestHandlingException as e:
+                response = e.get_response()
             if response.response_type is ResponseType.BROADCAST:
-                self._publish_message(response.message)
+                await self._publish_message(response.message)
             elif response.response_type is ResponseType.UNICAST:
-                self._send_message(message)
+                await self._send_message(response.message)
 
     async def _publish_message(self, message: typing.Any):
         await self._broadcast.publish(

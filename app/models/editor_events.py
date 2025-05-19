@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from enum import Enum
-from typing import Literal, Union, Annotated
+from typing import Literal, Union, Annotated, Any
 from app.models.document import DocElementType as BlockType
 
 
@@ -71,6 +71,12 @@ class BlockReleasedEvent(BaseModel):
     data: BlockReleasedData
 
 
+class DefaultEvent(BaseModel):
+    """Anything that follows general structure"""
+    type: str
+    data: Any
+
+
 class UserInfo(BaseModel):
     id: str
     name: str
@@ -81,9 +87,10 @@ class Event(BaseModel):
             BlockChangedEvent,
             BlockAddedEvent,
             BlockMovedEvent,
-            BlockRemovedEvent
+            BlockRemovedEvent,
+            DefaultEvent
         ],
-        Field(discriminator='type')
+        Field(union_mode='left_to_right')
     ]
     user: UserInfo | None = Field(default=None)
 
